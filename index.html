@@ -3050,7 +3050,7 @@ function abrirEditarTrabajador(dni){
         <input type="date" id="e_fcorte" value="${t.fisCorte||''}"></div>
     </div>
     <div class="calc" id="e_calc"></div>`,
-    [{txt:'Cancelar',cls:'ghost',fn:cerrar},{txt:'Guardar',cls:'primary',fn:()=>guardarEditar(dni)}]);
+    [{txt:'Cancelar',cls:'ghost',fn:cerrar},{txt:'Guardar',cls:'primary',fn:()=>guardarEditarTrabajador(dni)}]);
 
   const prev=()=>{
     const sim={
@@ -3078,7 +3078,7 @@ function abrirEditarTrabajador(dni){
   ['e_ing','e_ini','e_corte'].forEach(id=>document.getElementById(id).addEventListener('input',prev));
   prev();
 }
-async function guardarEditar(dni){
+async function guardarEditarTrabajador(dni){
   const t=TRAB.find(x=>x.dni===dni); if(!t) return;
   const nombre=document.getElementById('e_nom').value.trim().toUpperCase();
   if(!nombre) return toast('Falta el nombre',true);
