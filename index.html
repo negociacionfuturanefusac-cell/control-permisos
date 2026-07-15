@@ -1261,26 +1261,30 @@ input[type="date"], input[type="time"]{
    2) localStorage   — cuando descargas el archivo y lo abres en tu navegador
    3) memoria        — último recurso. NO PERSISTE, y la app te lo dice en la cara.  */
 let ALM='memoria';
+  const SUPABASE_URL='https://cedpndqczhagimakijcy.supabase.co';
+  const SUPABASE_KEY='sb_publishable__Fm0nST5cc9I_RZ60pjvVw_c6A2xhP5';
 if(window.storage){
   ALM='claude';
 } else {
-  let hayLocal=false;
-  try{ localStorage.setItem('__probe','1'); localStorage.removeItem('__probe'); hayLocal=true; }catch(e){}
-  if(hayLocal){
-    ALM='local';
-    window.storage={
-      get:async(k)=>{ const v=localStorage.getItem(k); if(v===null) throw new Error('no existe'); return {key:k,value:v}; },
-      set:async(k,v)=>{ localStorage.setItem(k,v); return {key:k,value:v}; },
-      delete:async(k)=>{ localStorage.removeItem(k); return {key:k,deleted:true}; }
-    };
-  } else {
-    const mem={};
-    window.storage={
-      get:async(k)=>{ if(!(k in mem)) throw new Error('no existe'); return {key:k,value:mem[k]}; },
-      set:async(k,v)=>{ mem[k]=v; return {key:k,value:v}; },
-      delete:async(k)=>{ delete mem[k]; return {key:k,deleted:true}; }
-    };
-  }
+  ALM='supabase';
+  window.storage={
+    get:async(k)=>{
+      const r=await fetch(SUPABASE_URL+'/rest/v1/app_data?select=value&key=eq.'+encodeURIComponent(k),{headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY}});
+      if(!r.ok) throw new Error('error de red');
+      const rows=await r.json();
+      if(!rows.length) throw new Error('no existe');
+      return {key:k,value:rows[0].value};
+},
+    set:async(k,v)=>{
+      const r=await fetch(SUPABASE_URL+'/rest/v1/app_data',{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY,'Content-Type':'application/json',Prefer:'resolution=merge-duplicates'},body:JSON.stringify({key:k,value:v})});
+      if(!r.ok) throw new Error('error al guardar');
+      return {key:k,value:v};
+  },
+    delete:async(k)=>{
+      await fetch(SUPABASE_URL+'/rest/v1/app_data?key=eq.'+encodeURIComponent(k),{method:'DELETE',headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY}});
+      return {key:k,deleted:true};
+    }
+  };
 }
 const ALM_TXT = {
   claude : ['💾','Los cambios se guardan','c1'],
