@@ -2446,7 +2446,7 @@ function pintarTrabajadores(){
       <td class="num" style="font-weight:700;color:var(--${f<0?'c5':'c3'})">${dd(f)}</td>
       <td class="num" style="font-weight:700;color:var(--${b<0?'c5':'c2'})">${hh(b)}</td>
       <td style="text-align:right;white-space:nowrap">
-        <button class="btn sm" onclick="abrirEditar('${t.dni}')">Editar</button>
+        <button class="btn sm" onclick="abrirEditarTrabajador('${t.dni}')">Editar</button>
         <button class="btn sm ghost" onclick="quitar('${t.dni}')" style="color:var(--c5)">Quitar</button>
       </td>
     </tr>`;
@@ -3020,7 +3020,7 @@ async function altaTrab(){
   await set(K_TRAB,TRAB); cerrar(); pintarRrhh(); toast('Trabajador agregado ✓');
 }
 
-function abrirEditar(dni){
+function abrirEditarTrabajador(dni){
   const t=TRAB.find(x=>x.dni===dni); if(!t) return;
   modal('Editar trabajador',`
     <div class="row2">
